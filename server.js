@@ -14,11 +14,16 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-app.post('/auth', (req, res) => {
+app.post('/login', (req, res) => {
   const { username, password } = req.body;
-  // Here you would check the database for user credentials and handle login/signup logic.
+  // Here you would typically check the database for user credentials and handle login/signup logic.
   // For now, we'll just send a success message.
-  res.status(200);
-  res.json({ message: `User ${username} logged in/sign up successfully!` });
-  console.log(`User ${username} logged in/sign up successfully!`);
+  res.json({ message: `User ${username} logged in successfully!` });
+});
+
+app.post('/signup', (req, res) => {
+  const { username, password } = req.body;
+  // Here you would typically create a new user in the database.
+  // For now, we'll just send a success message.
+  res.json({ message: `User ${username} signed up successfully!` });
 });
