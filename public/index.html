@@ -7,7 +7,20 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Welcome to the Language Learning App</h1>
+  <div class = "container">
+    <h1>Welcome to the Language Learning App</h1>
+    <form id="authForm">
+      <div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <button type="submit">Login/Sign Up</button>
+    </form>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
