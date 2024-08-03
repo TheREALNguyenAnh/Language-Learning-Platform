@@ -1,0 +1,5 @@
+Language Learning Platform - Dragonlingo
+First run npm i 
+Then run setup.sql inside your postgresql to setup your database
+Create an env.json in the style of env_sample.json
+npm run start to start the server.
