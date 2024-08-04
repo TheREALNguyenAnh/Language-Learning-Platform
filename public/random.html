@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Word</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <button id="submit">Define A Random Word</button>
+  <p id="pp"style="font-size: 40px; display: inline-block"></p>
+  <script>
+    let words = [];
+    fetch('/sample-words').then(response => {
+        return response.json();
+      }).then(body => {
+        words = body.words;
+      }).catch(error => {
+        return error;
+    });
+
+    let submit = document.getElementById('submit');
+    submit.addEventListener("click", () => {
+      let index = Math.floor(Math.random() * 200);
+      console.log(words[index]);
+      fetch('/word/' + words[index]).then(response => {
+        response.json().then(data => {
+          document.getElementById("pp").textContent = `${words[index]}: ${data[0].def[0].sseq[0][1][1].dt[0][1]}`;
+        });
+      });
+    });
+  </script>
+</body>
+</html>

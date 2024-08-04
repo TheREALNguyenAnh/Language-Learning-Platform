@@ -1,12 +1,16 @@
-const pg = require("pg");
-const express = require('express');
-const path = require('path');
-const app = express();
-const PORT = process.env.PORT || 3000;
-
 const env = require("./env.json");
+const keys = require("./keys.json");
+const words = require("./sample-words.json");
+
+const express = require('express');
+const app = express();
+const pg = require('pg');
+const path = require('path');
+const axios = require("axios");
+const PORT = process.env.PORT || 3000;
 const Pool = pg.Pool;
 const pool = new Pool(env);
+
 pool.connect().then(function () {
   console.log(`Connected to database ${env.database}`);
 });
@@ -14,8 +18,8 @@ pool.connect().then(function () {
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get('/sample-words', (req, res) => {
+  res.send(words);
 });
 
 app.post('/login', (req, res) => {
@@ -48,6 +52,15 @@ app.post('/signup', (req, res) => {
     console.error('Database error:', error);
     res.status(500).send({ message: 'Database error' });
   });
+});
+
+app.get('/word/:word', (req, res) => {
+  let url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${req.params.word}?key=${keys.dictionary}`;
+  axios(url).then(response => {
+    res.json(response.data);
+  }).catch(error => {
+    console.log(error);
+  })
 });
 
 app.listen(PORT, () => {
