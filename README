@@ -2,4 +2,5 @@
 First run npm i 
 Then run setup.sql inside your postgresql to setup your database
 Create an env.json in the style of env_sample.json
+api keys is needed and should be stored in keys.json
 npm run start to start the server.
