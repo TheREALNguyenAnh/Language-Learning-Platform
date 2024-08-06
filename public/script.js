@@ -46,7 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const result = await response.json();
-    alert(result.message);
+
+    if (response.ok) {
+      // Save the token to localStorage or sessionStorage
+      localStorage.setItem('authToken', result.token);
+      console.log(result.token);
+      window.location.href = '/protected'; 
+    } else {
+      alert(result.message);
+    }
   }
 
   // Function to handle form submission for signup
@@ -72,11 +80,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const result = await response.json();
     alert(result.message);
   }
+  //Testing function to test protected data
+  async function fetchProtectedData() {
+    const token = localStorage.getItem('authToken');
+
+    const response = await fetch('/protected', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }), // Send the token in the request body
+    });
+
+    const result = await response.json();
+    console.log(result);
+  }
 
   // Attach event listeners to the forms
   document.getElementById('loginForm').addEventListener('submit', handleLogin);
   document.getElementById('signupForm').addEventListener('submit', handleSignUp);
 
+  if (window.location.pathname === '/protected') {
+    fetchProtectedData();
+  }
   // Open default tab on load
   document.getElementById("defaultOpen").click();
 });

@@ -1,15 +1,18 @@
 const env = require("./env.json");
 const keys = require("./keys.json");
 const words = require("./sample-words.json");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const express = require('express');
 const app = express();
 const pg = require('pg');
 const path = require('path');
 const axios = require("axios");
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 const Pool = pg.Pool;
 const pool = new Pool(env);
+const secretKey = keys.authenticationKey; 
 
 pool.connect().then(function () {
   console.log(`Connected to database ${env.database}`);
@@ -22,37 +25,70 @@ app.get('/sample-words', (req, res) => {
   res.send(words);
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  pool.query('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]).then(result => {
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+
     if (result.rows.length > 0) {
-      res.status(200).send({ message: 'Login successful' });
-    } else {
-      res.status(400).send({ message: 'Invalid username or password' });
+      const user = result.rows[0];
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (isMatch) {
+        const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
+        return res.status(200).send({ message: 'Login successful', token });
+      }
     }
-  }).catch(error => {
+    res.status(400).send({ message: 'Invalid username or password' });
+  } catch (error) {
     console.error('Database error:', error);
     res.status(500).send({ message: 'Database error' });
-  });
+  }
 });
 
-app.post('/signup', (req, res) => {
+app.post('/signup',async (req, res) => {
 
   const { username, password } = req.body;
-  pool.query('SELECT 1 FROM users WHERE username = $1', [username]).then(userExistsResult => {
+  
+  try {
+    const userExistsResult = await pool.query('SELECT 1 FROM users WHERE username = $1', [username]);
     if (userExistsResult.rows.length > 0) {
       return res.status(400).send({ message: 'Username already exists' });
     }
-
-    // Insert the new user
-    return pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, password]);
-  }).then(() => {
+    
+    //Hashed password and insert new user
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
     res.status(200).send({ message: 'User signed up successfully' });
-  }).catch(error => {
+  } catch (error) {
     console.error('Database error:', error);
     res.status(500).send({ message: 'Database error' });
-  });
+  }
 });
+
+//authentication using JWT
+function isAuthenticated(req, res, next) {
+  const token = req.body.token;
+
+  if (!token) {
+    return res.status(401).send({ message: 'Unauthorized' });
+  }
+
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err) {
+      return res.status(403).send({ message: 'Forbidden' });
+    }
+    req.user = user;
+    next();
+  });
+}
+// Sample protected route to test user authentication
+app.post('/protected', isAuthenticated, (req, res) => {
+  res.status(200).send({ message: 'This is a protected route', user: req.user });
+  res.json({ message: 'This is a protected route' });
+  console.log('Red Spy in Base');
+});
+
 
 app.get('/word/:word', (req, res) => {
   let url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${req.params.word}?key=${keys.dictionary}`;
