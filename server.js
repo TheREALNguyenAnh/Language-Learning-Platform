@@ -3,8 +3,8 @@ const keys = require("./keys.json");
 const words = require("./sample-words.json");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
 const express = require('express');
+let cookieParser = require("cookie-parser");
 const app = express();
 const pg = require('pg');
 const path = require('path');
@@ -18,8 +18,15 @@ pool.connect().then(function () {
   console.log(`Connected to database ${env.database}`);
 });
 
+let cookieOptions = {
+  httpOnly: true,
+  secure: true,
+  sameSite: 'strict',
+};
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
 
 app.get('/sample-words', (req, res) => {
   res.send(words);
@@ -36,7 +43,7 @@ app.post('/login', async (req, res) => {
 
       if (isMatch) {
         const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
-        return res.status(200).send({ message: 'Login successful', token });
+        return res.cookie('token', token, cookieOptions).send({ message: 'Login successful' });
       }
     }
     res.status(400).send({ message: 'Invalid username or password' });
@@ -68,10 +75,10 @@ app.post('/signup',async (req, res) => {
 
 //authentication using JWT
 function isAuthenticated(req, res, next) {
-  const token = req.body.token;
+  const { token } = req.cookies;
 
   if (!token) {
-    return res.status(401).send({ message: 'Unauthorized' });
+    return res.status(401).send({ message: 'No Auth Token' });
   }
 
   jwt.verify(token, secretKey, (err, user) => {
@@ -82,12 +89,21 @@ function isAuthenticated(req, res, next) {
     next();
   });
 }
-// Sample protected route to test user authentication
-app.post('/protected', isAuthenticated, (req, res) => {
-  res.status(200).send({ message: 'This is a protected route', user: req.user });
-  res.json({ message: 'This is a protected route' });
+
+
+app.get('/loggedin', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'home.html'));
   console.log('Red Spy in Base');
 });
+
+app.get('/user-data', isAuthenticated, (req, res) => {
+  res.json({ username: req.user.username });
+});
+
+app.post('/logout', (req, res) => {
+  return res.clearCookie('token', cookieOptions).send({ message: 'Logged out successfully' });
+});
+
 
 
 app.get('/word/:word', (req, res) => {

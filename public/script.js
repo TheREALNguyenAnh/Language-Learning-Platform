@@ -48,10 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const result = await response.json();
 
     if (response.ok) {
-      // Save the token to localStorage or sessionStorage
-      localStorage.setItem('authToken', result.token);
-      console.log(result.token);
-      window.location.href = '/protected'; 
+      console.log('Loggin successfull');
+      window.location.href = '/loggedin'; 
     } else {
       alert(result.message);
     }
@@ -83,26 +81,24 @@ document.addEventListener('DOMContentLoaded', () => {
   //Testing function to test protected data
   async function fetchProtectedData() {
     const token = localStorage.getItem('authToken');
-
-    const response = await fetch('/protected', {
-      method: 'POST',
+    const response = await fetch('/loggedin', {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': token, // Use headers for token
       },
-      body: JSON.stringify({ token }), // Send the token in the request body
     });
 
-    const result = await response.json();
+    const result = await response.text();
     console.log(result);
+    
   }
 
   // Attach event listeners to the forms
   document.getElementById('loginForm').addEventListener('submit', handleLogin);
+  document.getElementById('loginForm').addEventListener('submit', fetchProtectedData());
+  
   document.getElementById('signupForm').addEventListener('submit', handleSignUp);
 
-  if (window.location.pathname === '/protected') {
-    fetchProtectedData();
-  }
   // Open default tab on load
   document.getElementById("defaultOpen").click();
 });
