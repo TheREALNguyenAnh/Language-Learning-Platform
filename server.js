@@ -1,5 +1,6 @@
 const env = require("./env.json");
 const keys = require("./keys.json");
+const apiKey = keys["dictionary"];
 const words = require("./sample-words.json");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -115,6 +116,21 @@ app.get('/word/:word', (req, res) => {
   })
 });
 
+
+const artData = [
+  { artid: "cow"},
+  { artid: "horse"},
+  { artid: "dog"},
+  { artid: "bird"}
+];
+
+app.get('/get-art', (req, res) => {
+  const randomIndex = Math.floor(Math.random() * artData.length);
+  res.json(artData[randomIndex]);
+});
+
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
