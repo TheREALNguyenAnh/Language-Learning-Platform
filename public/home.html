@@ -8,10 +8,45 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1 id="welcomeMessage">Welcome, </h1>
-    <button id="logoutButton">Log Out</button>
-  </div>
+ 
+  <main>
+    <h1>Welcome to Dragonlingo!</h1>
+    <section id="dashboard">
+        <h2><a href="#dashboard">Dashboard</a></h2>
+        <p>Access your latest lessons, upcoming tests, and recent achievements here.</p>
+    </section>
+    
+    <section id="courses">
+        <h2><a href="#courses">Courses</a></h2>
+        <div class="course-list">
+            <div class="course">
+                <h3>Spanish</h3>
+                <p>Next lesson</p>
+            </div>
+            <div class="course">
+                <h3>French</h3>
+                <p>Next lesson</p>
+            </div>
+            <div class="course">
+                <h3>German</h3>
+                <p>Next lesson</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="progress">
+        <h2><a href="#progress">Progress</a></h2>
+        <p>Check your learning stats, streaks, and overall progress here.</p>
+    </section>
+
+    <section id="profile">
+        <h2><a href="#profile">Profile</a></h2>
+        <p>Update your personal information and learning preferences here.</p>
+    </section>
+    <div class="container">
+      <button id="logoutButton">Log Out</button>
+    </div>
+  </main>
   <script src="homeScript.js"></script>
 </body>
 </html>
