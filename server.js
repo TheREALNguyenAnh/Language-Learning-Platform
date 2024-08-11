@@ -28,8 +28,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
-app.get('/sample-words', (req, res) => {
-  res.send(words);
+app.get('/random-word', (req, res) => {
+  let index = Math.floor(Math.random() * words.length);
+  res.set('Content-Type', 'text/plain');
+  res.send(words[index]);
 });
 
 app.post('/login', async (req, res) => {
@@ -106,10 +108,28 @@ app.post('/logout', (req, res) => {
 
 
 
-app.get('/word/:word', (req, res) => {
+app.get('/mwd/:word', (req, res) => {
   let url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${req.params.word}?key=${keys.dictionary}`;
   axios(url).then(response => {
-    res.json(response.data);
+    let word = req.params.word;
+    let shortdef = response.data[0].shortdef[0];
+    let audio = response.data[0].hwi.prs[0].sound.audio;
+    let regex = '/^\d/';
+    let subdirectory;
+    if(audio.startsWith('bix')) {
+      subdirectory = 'bix';
+    }
+    else if(audio.startsWith('gg')) {
+      subdirectory = 'gg';
+    }
+    else if(/^\d|\p{P}/u.test(audio)) {
+      subdirectory = 'number';
+    }
+    else {
+      subdirectory = audio[0];
+    }
+    let audiourl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdirectory}/${audio}.mp3`;
+    res.json({'shortdef': shortdef, 'audiourl': audiourl});
   }).catch(error => {
     console.log(error);
   })
