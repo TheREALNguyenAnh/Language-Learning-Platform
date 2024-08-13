@@ -134,3 +134,26 @@ app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
+// Create a new flashcard set
+app.post('/flashcard-sets', isAuthenticated, async (req, res) => {
+  // Logic to create a new flashcard set
+});
+
+// Add a flashcard to a set
+app.post('/flashcard-sets/:setId/flashcards', isAuthenticated, async (req, res) => {
+  // Logic to add a flashcard to a specific set
+});
+
+// Edit a flashcard
+app.put('/flashcards/:id', isAuthenticated, async (req, res) => {
+  // Logic to edit a flashcard
+});
+
+// Get all flashcard sets
+app.get('/flashcard-sets', async (req, res) => {
+  // Logic to retrieve all flashcard sets
+});
+
+app.get('/flashcards-game', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'flashcards.html'));
+});
