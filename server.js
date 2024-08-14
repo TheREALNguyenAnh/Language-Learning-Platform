@@ -11,8 +11,18 @@ const pg = require('pg');
 const path = require('path');
 const axios = require("axios");
 const PORT = 3000;
-const Pool = pg.Pool;
-const pool = new Pool(env);
+let host;
+let dbConf;
+if (process.env.NODE_ENV === 'production') {
+  host = '0.0.0.0';
+  dbConf = { connectionString: process.env.DATABASE_URL };
+}
+else {
+  host = 'localhost';
+  let { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT } = process.env;
+  dbConf = { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT };
+}
+const pool = new Pool(dbConf);
 const secretKey = keys.authenticationKey; 
 
 pool.connect().then(function () {
@@ -131,7 +141,7 @@ app.get('/get-art', (req, res) => {
 
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://${host}:${PORT}`);
 });
 
 // Create a new flashcard set
