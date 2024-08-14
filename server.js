@@ -6,10 +6,11 @@ const jwt = require('jsonwebtoken');
 const express = require('express');
 let cookieParser = require("cookie-parser");
 const app = express();
-const pg = require('pg');
 const path = require('path');
 const axios = require("axios");
 const PORT = 3000;
+let { Pool } = require("pg");
+process.chdir(__dirname);
 let host;
 let dbConf;
 if (process.env.NODE_ENV === 'production') {
@@ -21,11 +22,12 @@ else {
   let { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT } = process.env;
   dbConf = { PGUSER, PGPASSWORD, PGDATABASE, PGHOST, PGPORT };
 }
-const pool = new Pool(dbConf);
+
+let pool = new Pool(dbConf);
 const secretKey = keys.authenticationKey; 
 
 pool.connect().then(function () {
-  console.log(`Connected to database}`);
+  console.log(`Connected to database`);
 });
 
 let cookieOptions = {
