@@ -1,4 +1,3 @@
-const env = require("./env.json");
 const keys = require("./keys.json");
 const apiKey = keys["dictionary"];
 const words = require("./sample-words.json");
@@ -26,7 +25,7 @@ const pool = new Pool(dbConf);
 const secretKey = keys.authenticationKey; 
 
 pool.connect().then(function () {
-  console.log(`Connected to database ${env.database}`);
+  console.log(`Connected to database}`);
 });
 
 let cookieOptions = {

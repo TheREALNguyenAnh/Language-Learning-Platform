@@ -4,7 +4,10 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "setup": "fly postgres connect -a dragonlingo-db < setup.sql",
+    "start:dev": "env-cmd node server.js",
+    "setup:dev": "env-cmd psql -d postgres -f setup.sql"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +20,8 @@
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.4.11"
   }
 }
