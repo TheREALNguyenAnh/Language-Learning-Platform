@@ -1,5 +1,5 @@
-CREATE DATABASE dragonlingo;
-\c dragonlingo
+CREATE DATABASE language_learning_platform;
+\c language_learning_platform
 CREATE TABLE users (
 	id SERIAL PRIMARY KEY,
 	username VARCHAR(50) UNIQUE NOT NULL,

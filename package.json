@@ -4,9 +4,9 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "setup": "fly postgres connect -a dragonlingo-db < setup.sql",
-    "start:dev": "env-cmd node server.js",
+    "start": "node app/server.js",
+    "setup": "fly postgres connect -a language-learning-platform-db < setup.sql",
+    "start:dev": "env-cmd node app/server.js",
     "setup:dev": "env-cmd psql -d postgres -f setup.sql"
   },
   "keywords": [],

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Language Learning App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Language Learning App</h1>
+    <div class="tab">
+      <button class="tablinks" data-tab="Login" id="defaultOpen">Login</button>
+      <button class="tablinks" data-tab="SignUp">Sign Up</button>
+    </div>
+
+    <div id="Login" class="tabcontent">
+      <form id="loginForm">
+        <div>
+          <label for="loginUsername">Username:</label>
+          <input type="text" id="loginUsername" name="username" required>
+        </div>
+        <div>
+          <label for="loginPassword">Password:</label>
+          <input type="password" id="loginPassword" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+
+    <div id="SignUp" class="tabcontent">
+      <form id="signupForm">
+        <div>
+          <label for="signupUsername">Username:</label>
+          <input type="text" id="signupUsername" name="username" required>
+        </div>
+        <div>
+          <label for="signupPassword">Password:</label>
+          <input type="password" id="signupPassword" name="password" required minlength="8" maxlength="16">
+        </div>
+        <div>
+          <label for="repeatPassword">Repeat Password:</label>
+          <input type="password" id="repeatPassword" name="repeatPassword" required minlength="8" maxlength="16">
+        </div>
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

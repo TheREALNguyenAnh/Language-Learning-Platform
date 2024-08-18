@@ -1,10 +1,12 @@
-# fly.toml app configuration file generated for dragonlingo on 2024-08-14T06:04:43-04:00
+# fly.toml app configuration file generated for language-learning-platform on 2024-08-17T22:20:29-04:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'dragonlingo'
+app = 'language-learning-platform'
 primary_region = 'ewr'
+
+[build]
 
 [http_service]
   internal_port = 3000

@@ -1,13 +1,13 @@
 # syntax = docker/dockerfile:1
 
 # Adjust NODE_VERSION as desired
-ARG NODE_VERSION=20.9.0
+ARG NODE_VERSION=20.16.0
 FROM node:${NODE_VERSION}-slim as base
 
 LABEL fly_launch_runtime="Node.js"
 
 # Node.js app lives here
-WORKDIR /
+WORKDIR /app
 
 # Set production environment
 ENV NODE_ENV="production"
@@ -32,7 +32,7 @@ COPY --link . .
 FROM base
 
 # Copy built application
-COPY --from=build / /
+COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
