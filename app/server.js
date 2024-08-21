@@ -148,6 +148,22 @@ app.get('/mwd/:word', (req, res) => {
   })
 });
 
+app.post('/translate', (req, res) => {
+  const reqBody = req.body;
+  let reqUrl = `https://translation.googleapis.com/language/translate/v2?key=${keys.translate}`;
+  axios({
+    method: 'post',
+    url: reqUrl,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8'
+    },
+    data: reqBody
+  }).then(response => {
+    res.send(response.data);
+  }).catch(error => {
+    console.log(error);
+  });
+});
 
 const artData = [
   { artid: "cow"},
