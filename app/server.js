@@ -201,6 +201,96 @@ app.get('/flashcards-game', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'flashcards.html'));
 });
 
+let games = {};
+
+app.post('/start-hangman', (req, res) => {
+    const { userId } = req.body;
+    const word = getRandomWord();
+    const gameId = Date.now(); 
+
+    games[gameId] = {
+        userId,
+        word,
+        correctLetters: [],
+        wrongGuessCount: 0,
+        maxGuesses: 6,
+        status: 'in_progress'
+    };
+
+    res.json({ gameId, word, maxGuesses: 6 });
+});
+
+app.post('/update-progress', async (req, res) => {
+  const { userId, isVictory } = req.body;
+  try {
+      const result = await pool.query(
+          `UPDATE hangman_progress
+          SET games_played = games_played + 1,
+              ${isVictory ? 'games_won = games_won + 1' : 'games_lost = games_lost + 1'},
+              last_game = CURRENT_TIMESTAMP
+          WHERE user_id = $1
+          RETURNING *`,
+          [userId]
+      );
+      
+      if (result.rowCount === 0) {
+          await pool.query(
+              `INSERT INTO hangman_progress (user_id, games_played, games_won, games_lost)
+               VALUES ($1, 1, $2, $3)`,
+              [userId, isVictory ? 1 : 0, isVictory ? 0 : 1]
+          );
+      }
+
+      res.json({ message: 'Progress updated successfully!' });
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+  }
+});
+
+app.post('/guess', (req, res) => {
+    const { gameId, letter } = req.body;
+    const game = games[gameId];
+
+    if (!game || game.status !== 'in_progress') {
+        return res.status(404).send('Game not found or already finished.');
+    }
+
+    if (game.word.includes(letter)) {
+        [...game.word].forEach((l, index) => {
+            if (l === letter && !game.correctLetters.includes(l)) {
+                game.correctLetters.push(l);
+            }
+        });
+    } else {
+        game.wrongGuessCount++;
+    }
+
+    if (game.wrongGuessCount >= game.maxGuesses) {
+        game.status = 'lost';
+    } else if (game.correctLetters.length === game.word.length) {
+        game.status = 'won';
+    }
+
+    res.json({ game });
+});
+
+app.get('/hangman-progress/:gameId', (req, res) => {
+    const { gameId } = req.params;
+    const game = games[gameId];
+    
+    if (!game) {
+        return res.status(404).send('Game not found.');
+    }
+
+    res.json({ game });
+});
+
+const getRandomWord = () => {
+    const words = ['apple', 'banana', 'orange', 'grape', 'lemon'];
+    return words[Math.floor(Math.random() * words.length)];
+};
+
 app.listen(PORT, host, () => {
   console.log(`Server is running on http://${host}:${PORT}`);
 });

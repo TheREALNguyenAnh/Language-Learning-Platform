@@ -29,4 +29,12 @@ CREATE TABLE flashcard_edits (
     previous_definition TEXT,
     edited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE hangman_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    games_played INTEGER DEFAULT 0,
+    games_won INTEGER DEFAULT 0,
+    games_lost INTEGER DEFAULT 0,
+    last_game TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
