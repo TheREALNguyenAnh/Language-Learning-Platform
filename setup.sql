@@ -29,4 +29,10 @@ CREATE TABLE flashcard_edits (
     previous_definition TEXT,
     edited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
+CREATE TABLE quiz (
+    user_id INTEGER REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT quiz_id PRIMARY KEY (user_id),
+    taken_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    successes INTEGER NOT NULL DEFAULT 0,
+    attempts INTEGER NOT NULL DEFAULT 0
+);

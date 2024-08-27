@@ -45,10 +45,12 @@ async function main() {
     q3.children[0].textContent = quizOptionsTranslated[2].translatedText;
 
     function onClick(event) {
+        console.log(this + 'was clicked');
         if(this.textContent.trim() === quizWordTranslated)
             this.style.backgroundColor = '#5bd123';
         else
             this.style.backgroundColor = '#e74c3c';
+        this.removeEventListener('click', onClick);
     }
 
     q1.addEventListener('click', onClick);
