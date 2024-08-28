@@ -15,6 +15,7 @@
 });*/
 
 async function main() {
+    let userid = await getUserID();
     let quizOptions = [];
     let quizWord = await getWord();
     
@@ -45,12 +46,20 @@ async function main() {
     q3.children[0].textContent = quizOptionsTranslated[2].translatedText;
 
     function onClick(event) {
-        console.log(this + 'was clicked');
-        if(this.textContent.trim() === quizWordTranslated)
+        if(this.textContent.trim() === quizWordTranslated) {
+            q1.removeEventListener('click', onClick);
+            q2.removeEventListener('click', onClick);
+            q3.removeEventListener('click', onClick);
+            q1.className = 'question-clicked';
+            q2.className = 'question-clicked';
+            q3.className = 'question-clicked';
             this.style.backgroundColor = '#5bd123';
-        else
+        }
+        else {
+            this.className = 'question-clicked';
             this.style.backgroundColor = '#e74c3c';
-        this.removeEventListener('click', onClick);
+            this.removeEventListener('click', onClick);
+        }
     }
 
     q1.addEventListener('click', onClick);
@@ -92,6 +101,53 @@ async function translateWords(quizOptions) {
         console.error(error.message);
         return null;
     }
-}
+};
+
+async function getUserID() {
+    try {
+        const response = await fetch('/user-data', {
+            method: 'GET',
+            credentials: 'include',
+        });
+        if(!response.ok) {
+            throw new Error(`Response status: ${response.status}`)
+        }
+        const { username } = await response.json();
+
+        const response2 = await fetch('/userid', {
+            method: 'POST',
+            body: JSON.stringify({username: username}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        const { userid } = await response2.json();
+        if(!response2.ok) {
+            throw new Error(`Response status: ${response.status}`)
+        }
+        return userid;
+    } catch (error) {
+        console.error(error.message);
+        return null;
+    }
+};
+
+async function updateDB(userid, successes, attempts) {
+    try {
+        const response = await fetch('/insert-quiz', {
+            method: 'POST',
+            body: JSON.stringify({userid: userid, successes: successes, attempts: attempts}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        if(!response.ok) {
+            throw new Error(`Response status: ${response.status}`)
+        } 
+    } catch (error) {
+        console.error(error.message);
+        return null;
+    }
+};
 
 main().catch(console.log);

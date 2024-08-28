@@ -38,8 +38,9 @@ let cookieOptions = {
 };
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.get('/random-word', (req, res) => {
   let index = Math.floor(Math.random() * words.length);
@@ -68,7 +69,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/signup',async (req, res) => {
+app.post('/signup', async (req, res) => {
 
   const { username, password } = req.body;
   
@@ -119,7 +120,23 @@ app.post('/logout', (req, res) => {
   return res.clearCookie('token', cookieOptions).send({ message: 'Logged out successfully' });
 });
 
+app.post('/userid', async (req, res) => {
+  const { username } = req.body;
+  try {
+    const useridquery = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
+    res.json({ userid: useridquery.rows[0].id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error.toString());
+  }
+});
 
+app.post('/insert-quiz', async (req, res) => {
+  const { userid, successes, attempts } = req.body;
+  let insertquizquery = await pool.query('INSERT INTO quiz (user_id, successes, attempts) VALUES ($1, $2, $3)', [userid, successes, attempts]);
+  console.log(insertquizquery);
+  res.end();
+});
 
 app.get('/mwd/:word', (req, res) => {
   let url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${req.params.word}?key=${keys.dictionary}`;
