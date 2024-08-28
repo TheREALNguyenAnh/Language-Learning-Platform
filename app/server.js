@@ -1,5 +1,4 @@
 const keys = require("./keys.json");
-const apiKey = keys["dictionary"];
 const words = require("./sample-words.json");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -40,13 +39,6 @@ let cookieOptions = {
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-
-app.get('/random-word', (req, res) => {
-  let index = Math.floor(Math.random() * words.length);
-  res.set('Content-Type', 'text/plain');
-  res.send(words[index]);
-});
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -138,6 +130,12 @@ app.post('/insert-quiz', async (req, res) => {
   res.end();
 });
 
+app.get('/random-word', (req, res) => {
+  let index = Math.floor(Math.random() * words.length);
+  res.set('Content-Type', 'text/plain');
+  res.send(words[index]);
+});
+
 app.get('/mwd/:word', (req, res) => {
   let url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${req.params.word}?key=${keys.dictionary}`;
   axios(url).then(response => {
@@ -221,3 +219,20 @@ app.get('/flashcards-game', isAuthenticated, (req, res) => {
 app.listen(PORT, host, () => {
   console.log(`Server is running on http://${host}:${PORT}`);
 });
+
+function getRandomWordList() {
+    let reqUrl = `https://wordsapiv1.p.rapidapi.com/words/?limit=100&page=100&frequencyMin=3.35`;
+    axios({
+      url: reqUrl,
+      headers: {
+        'x-rapidapi-key': '6a7299b60cmsh45fba08f2cada49p1468cejsnb2307733b40c',
+        'x-rapidapi-host': 'wordsapiv1.p.rapidapi.com'
+      }
+    }).then(response => {
+      console.log(response.data.results.data);
+    }).catch(error => {
+      console.error(error);
+    });
+};
+
+getRandomWordList();
