@@ -68,7 +68,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/signup',async (req, res) => {
+app.post('/signup', async (req, res) => {
 
   const { username, password } = req.body;
   
@@ -119,7 +119,9 @@ app.post('/logout', (req, res) => {
   return res.clearCookie('token', cookieOptions).send({ message: 'Logged out successfully' });
 });
 
+app.post('/insert-quiz', (req, res) => {
 
+});
 
 app.get('/mwd/:word', (req, res) => {
   let url = `https://dictionaryapi.com/api/v3/references/collegiate/json/${req.params.word}?key=${keys.dictionary}`;

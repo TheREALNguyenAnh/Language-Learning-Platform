@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     if (response.ok) {
       const { username } = await response.json();
-      document.getElementById('welcomeMessage').textContent = `Welcome, ${username}`;
+      document.getElementById('welcomemessage').textContent = `Welcome, ${username}`;
     }
     
   });
