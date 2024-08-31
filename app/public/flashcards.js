@@ -102,12 +102,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function logPerformance() {
+        try {
+            const response = await fetch('/log-performance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    correctGuesses: correctGuesses,
+                    incorrectGuesses: incorrectGuesses
+                })
+            });
+
+            if (!response.ok) {
+                console.error('Failed to log performance');
+            }
+        } catch (error) {
+            console.error('Error logging performance:', error);
+        }
+    }
+
+
     function resetSelection() {
         if (selectedWord) selectedWord.classList.remove('selected', 'correct', 'incorrect');
         if (selectedDefinition) selectedDefinition.classList.remove('selected', 'correct', 'incorrect');
         selectedWord = null;
         selectedDefinition = null;
     }
+    document.getElementById('backButton').addEventListener('click', async () => {
+        await logPerformance();
+        window.location.href = '/loggedin';
+
+    });
 
     // Load the flashcards when the game starts
     loadFlashcards();

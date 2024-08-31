@@ -85,6 +85,7 @@ app.post('/signup',async (req, res) => {
   } catch (error) {
     console.error('Database error:', error);
     res.status(500).send({ message: 'Database error' });
+    console.log(error);
   }
 });
 
@@ -175,6 +176,42 @@ const artData = [
 app.get('/get-art', (req, res) => {
   const randomIndex = Math.floor(Math.random() * artData.length);
   res.json(artData[randomIndex]);
+});
+
+app.post('/log-performance', isAuthenticated, async (req, res) => {
+  const { correctGuesses, incorrectGuesses } = req.body;
+  const userId = req.user.id; // Extract user ID from the decoded JWT
+
+  try {
+      const query = `
+          UPDATE users 
+          SET flash_card_correct_guesses = flash_card_correct_guesses + $1, 
+              flash_card_incorrect_guesses = flash_card_incorrect_guesses + $2 
+          WHERE id = $3
+      `;
+      await pool.query(query, [correctGuesses, incorrectGuesses, userId]);
+      res.status(200).json({ message: 'Performance logged successfully' });
+  } catch (error) {
+      console.error('Error logging performance:', error);
+      res.status(500).json({ message: 'Failed to log performance' });
+  }
+});
+
+app.get('/performance-stats', isAuthenticated, async (req, res) => {
+  try {
+      const userId = req.user.id;
+      const result = await pool.query('SELECT flash_card_correct_guesses, flash_card_incorrect_guesses FROM users WHERE id = $1', [userId]);
+
+      if (result.rows.length > 0) {
+          const { flash_card_correct_guesses, flash_card_incorrect_guesses } = result.rows[0];
+          res.json({ correctMatches: flash_card_correct_guesses, incorrectMatches: flash_card_incorrect_guesses });
+      } else {
+          res.status(404).json({ message: 'User not found' });
+      }
+  } catch (error) {
+      console.error('Error fetching performance stats:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
 });
 
 // Create a new flashcard set
