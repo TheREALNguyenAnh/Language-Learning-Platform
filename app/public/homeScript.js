@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           method: 'GET',
           credentials: 'include',
       });
-
       if (userResponse.ok) {
           const { username } = await userResponse.json();
           document.getElementById('welcomeMessage').textContent = `Welcome, ${username}`;
