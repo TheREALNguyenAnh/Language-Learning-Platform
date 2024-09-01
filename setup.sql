@@ -14,3 +14,19 @@ CREATE TABLE quiz (
     successes INTEGER NOT NULL DEFAULT 0,
     attempts INTEGER NOT NULL DEFAULT 0
 );
+CREATE TABLE hangman_progress (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    games_played INTEGER DEFAULT 0,
+    games_won INTEGER DEFAULT 0,
+    games_lost INTEGER DEFAULT 0,
+    last_game TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE imagegame_progress (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    games_played INTEGER DEFAULT 0,
+    games_won INTEGER DEFAULT 0,
+    games_lost INTEGER DEFAULT 0,
+    last_game TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

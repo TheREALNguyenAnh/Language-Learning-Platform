@@ -47,3 +47,11 @@ document.getElementById('gameButton').addEventListener('click', function() {
   window.location.href = '/flashcards-game';
 });
 
+document.getElementById('hangman').addEventListener('click', function() {
+    window.location.href = '/hangman';
+  });
+
+  document.getElementById('imageGame').addEventListener('click', function() {
+    window.location.href = '/imageGame';
+  });
+

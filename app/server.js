@@ -183,6 +183,34 @@ app.post('/translate', (req, res) => {
   });
 });
 
+app.get('/fetch-photo', async (req, res) => {
+  const { searchTerm } = req.query; 
+
+  if (!searchTerm) {
+      return res.status(400).json({ error: 'Search term is required' });
+  }
+
+  try {
+      const photoUrl = `https://api.unsplash.com/search/photos?query=${searchTerm}&client_id=${keys.images}`;
+      const response = await fetch(photoUrl);
+      if (!response.ok) {
+          throw new Error(`Unsplash API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.results.length > 0) {
+          const imageUrl = data.results[0].urls.regular;
+          res.json({ photoUrl: imageUrl });
+      } else {
+          res.status(404).json({ error: 'No photos found' });
+      }
+  } catch (error) {
+      console.error('Error fetching photo:', error);
+      res.status(500).json({ error: 'Failed to fetch photo' });
+  }
+});
+
 const artData = [
   { artid: "cow"},
   { artid: "horse"},
@@ -194,6 +222,127 @@ app.get('/get-art', (req, res) => {
   const randomIndex = Math.floor(Math.random() * artData.length);
   res.json(artData[randomIndex]);
 });
+
+let games = {};
+
+app.post('/start-hangman', (req, res) => {
+    const { userId } = req.body;
+    const word = getRandomWord();
+    const gameId = Date.now(); 
+
+    games[gameId] = {
+        userId,
+        word,
+        correctLetters: [],
+        wrongGuessCount: 0,
+        maxGuesses: 6,
+        status: 'in_progress'
+    };
+
+    res.json({ gameId, word });
+});
+
+app.post('/update-hangman-progress', async (req, res) => {
+  const { userId, isVictory } = req.body;
+  try {
+      const result = await pool.query(
+          `UPDATE hangman_progress
+          SET games_played = games_played + 1,
+              ${isVictory ? 'games_won = games_won + 1' : 'games_lost = games_lost + 1'},
+              last_game = CURRENT_TIMESTAMP
+          WHERE username = $1
+          RETURNING *`,
+          [userId]
+      );
+      
+      if (result.rowCount === 0) {
+          // If no progress record exists for the user, create one
+          await pool.query(
+              `INSERT INTO hangman_progress (username, games_played, games_won, games_lost)
+               VALUES ($1, 1, $2, $3)`,
+              [userId, isVictory ? 1 : 0, isVictory ? 0 : 1]
+          );
+      }
+
+      res.json({ message: 'Progress updated successfully!' });
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+  }
+});
+
+app.post('/guess-hangman', (req, res) => {
+    const { gameId, letter } = req.body;
+    const game = games[gameId];
+
+    if (!game || game.status !== 'in_progress') {
+        return res.status(404).send('Game not found or already finished.');
+    }
+
+    if (game.word.includes(letter)) {
+        [...game.word].forEach((l, index) => {
+            if (l === letter && !game.correctLetters.includes(l)) {
+                game.correctLetters.push(l);
+            }
+        });
+    } else {
+        game.wrongGuessCount++;
+    }
+
+    if (game.wrongGuessCount >= game.maxGuesses) {
+        game.status = 'lost';
+    } else if (game.correctLetters.length === game.word.length) {
+        game.status = 'won';
+    }
+
+    res.json({ game });
+});
+
+app.get('/hangman-progress/:gameId', (req, res) => {
+    const { gameId } = req.params;
+    const game = games[gameId];
+    
+    if (!game) {
+        return res.status(404).send('Game not found.');
+    }
+
+    res.json({ game });
+});
+
+
+app.post('/update-imagegame-progress', async (req, res) => {
+const { userId, isVictory } = req.body;
+try {
+    const result = await pool.query(
+        `UPDATE imagegame_progress
+        SET games_played = games_played + 1,
+            ${isVictory ? 'games_won = games_won + 1' : 'games_lost = games_lost + 1'},
+            last_game = CURRENT_TIMESTAMP
+        WHERE username = $1
+        RETURNING *`,
+        [userId]
+    );
+    
+    if (result.rowCount === 0) {
+        // If no progress record exists for the user, create one
+        await pool.query(
+            `INSERT INTO imagegame_progress (username, games_played, games_won, games_lost)
+             VALUES ($1, 1, $2, $3)`,
+            [userId, isVictory ? 1 : 0, isVictory ? 0 : 1]
+        );
+    }
+
+    res.json({ message: 'Progress updated successfully!' });
+} catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+}
+});
+
+const getRandomWord = () => {
+  const words = ['apple', 'banana', 'orange', 'grape', 'lemon'];
+  return words[Math.floor(Math.random() * words.length)];
+};
 
 app.post('/log-performance', isAuthenticated, async (req, res) => {
   const { correctGuesses, incorrectGuesses } = req.body;
@@ -253,6 +402,14 @@ app.get('/flashcard-sets', async (req, res) => {
 
 app.get('/flashcards-game', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'flashcards.html'));
+});
+
+app.get('/hangman', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'hangman.html'));
+});
+
+app.get('/imageGame', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'image_game.html'));
 });
 
 app.listen(PORT, host, () => {
