@@ -5,13 +5,152 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Picture-Word Game</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        img { width: 300px; height: 300px; margin-bottom: 20px; }
-        .choices button { margin: 10px; padding: 10px 20px; display: block; }
-        .caption { margin-top: 20px; font-size: 18px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            padding: 10px 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        nav button:hover {
+            color: #d1ecff;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #artImage {
+            width: 300px;
+            height: 300px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        #artImage:hover {
+            transform: scale(1.05);
+        }
+
+        .choices {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .choices button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .choices button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+
+        .choices button:active {
+            transform: translateY(0);
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Modal for Rules */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal p {
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
+    <nav>
+        <button onclick="window.location.href='home.html'">Go Back</button>
+        <button onclick="document.getElementById('rulesModal').style.display='block'">Rules of the Game</button>
+    </nav>
+
+    <h1>Picture-Word Game</h1>
     <img id="artImage" src="https://via.placeholder.com/300" alt="Picture to guess">
     <div class="choices">
         <button onclick="checkAnswer(this)">Option 1</button>
@@ -19,6 +158,32 @@
         <button onclick="checkAnswer(this)">Option 3</button>
         <button onclick="checkAnswer(this)">Option 4</button>
     </div>
+
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Game Rules</h2>
+                <span class="close" onclick="document.getElementById('rulesModal').style.display='none'">&times;</span>
+            </div>
+            <p>1. A picture will be displayed at the top of the screen.</p>
+            <p>2. Four options will be presented below the picture.</p>
+            <p>3. Click on the option that best matches the picture.</p>
+            <p>4. If you select the correct answer, you win and the next round begins!</p>
+            <p>5. If you select the wrong answer, you can try again.</p>
+        </div>
+    </div>
+
+
     <script src="image_game.js" defer></script>
+    <script>
+        // Close the modal if clicked outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('rulesModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
