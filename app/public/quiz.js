@@ -1,23 +1,29 @@
 
-/*fetch('/translate', {
-    method: 'POST',
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({q: 'I see a beautiful sunrise', source: 'en', target: 'fr', format: 'text'}),
-}).then(response => {
-    return response.json();
-}).then(body => {
-    let p = document.getElementById('pp');
-    p.textContent = body.data.translations[0].translatedText;
-}).catch(error => {
-    console.log(error);
-});*/
-
 async function main() {
     let userid = await getUserID();
+    let lastQuiz = await getRecentQuiz(userid);
+    let previousQuizWords = [];
+    if (lastQuiz.length > 0) {
+        const timestamp = Date.now();
+        const lastQuizTimestamp = Date.parse(lastQuiz[0].taken_at);
+        if (timestamp - lastQuizTimestamp < 86400000) {
+            window.location.href = 'quizcd.html'
+        }
+        else {
+            let rows = await getPreviousWords(userid);
+            for (const row of rows) {
+                previousQuizWords.push(row.word);
+            }
+        }
+    }
+    console.log(previousQuizWords);
     let quizOptions = [];
     let quizWord = await getWord();
+    while (previousQuizWords.includes(quizWord)) {
+        quizWord = await getWord();
+    }
+    let succeses = 0;
+    let attempts = 0;
     
     let header = document.getElementById('header');
     let str = header.textContent.slice(0, 25) + quizWord + header.textContent.slice(25);
@@ -54,11 +60,18 @@ async function main() {
             q2.className = 'question-clicked';
             q3.className = 'question-clicked';
             this.style.backgroundColor = '#5bd123';
+            succeses++;
+            attempts++;
+            insertQuiz(userid, quizWord, succeses, attempts);
+            setTimeout(() => { 
+                window.location.href = 'quizcd.html'
+            }, 1000);
         }
         else {
             this.className = 'question-clicked';
             this.style.backgroundColor = '#e74c3c';
             this.removeEventListener('click', onClick);
+            attempts++;
         }
     }
 
@@ -132,11 +145,49 @@ async function getUserID() {
     }
 };
 
-async function updateDB(userid, successes, attempts) {
+async function getPreviousWords(userid) {
+    try {
+        const response = await fetch('/get-quiz-words', {
+            method: 'POST',
+            body: JSON.stringify({userid: userid}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        if(!response.ok) {
+            throw new Error(`Response status: ${response.status}`)
+        }
+        return response.json();
+    } catch (error) {
+        console.error(error.message);
+        return null;
+    }
+};
+
+async function getRecentQuiz(userid) {
+    try {
+        const response = await fetch('/get-recent-quiz', {
+            method: 'POST',
+            body: JSON.stringify({userid: userid}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        if(!response.ok) {
+            throw new Error(`Response status: ${response.status}`)
+        }
+        return response.json();
+    } catch (error) {
+        console.error(error.message);
+        return null;
+    }
+};
+
+async function insertQuiz(userid, word, successes, attempts) {
     try {
         const response = await fetch('/insert-quiz', {
             method: 'POST',
-            body: JSON.stringify({userid: userid, successes: successes, attempts: attempts}),
+            body: JSON.stringify({userid: userid, word: word, successes: successes, attempts: attempts}),
             headers: {
                 'Content-Type': 'application/json'
             },

@@ -1,5 +1,4 @@
 const keys = require("./keys.json");
-const words = require("./sample-words.json");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const express = require('express');
@@ -7,6 +6,7 @@ let cookieParser = require("cookie-parser");
 const app = express();
 const path = require('path');
 const axios = require("axios");
+const words = require("./sample-words.json");
 const PORT = 3000;
 let { Pool } = require("pg");
 process.chdir(__dirname);
@@ -125,10 +125,27 @@ app.post('/userid', async (req, res) => {
 });
 
 app.post('/insert-quiz', async (req, res) => {
-  const { userid, successes, attempts } = req.body;
-  let insertquizquery = await pool.query('INSERT INTO quiz (user_id, successes, attempts) VALUES ($1, $2, $3)', [userid, successes, attempts]);
-  console.log(insertquizquery);
+  const { userid, word, successes, attempts } = req.body;
+  let insertquizquery = await pool.query('INSERT INTO quiz (user_id, word, successes, attempts) VALUES ($1, $2, $3, $4)', [userid, word, successes, attempts]);
   res.end();
+});
+
+app.post('/get-recent-quiz', async (req, res) => {
+  const { userid } = req.body;
+  let getquizzesquery = await pool.query('SELECT * FROM quiz WHERE user_id = $1 ORDER BY taken_at DESC LIMIT 1', [userid]);
+  res.json(getquizzesquery.rows);
+});
+
+app.post('/get-quizzes', async (req, res) => {
+  const { userid } = req.body;
+  let getquizzesquery = await pool.query('SELECT * FROM quiz WHERE user_id = $1', [userid]);
+  res.json(getquizzesquery.rows);
+});
+
+app.post('/get-quiz-words', async (req, res) => {
+  const { userid } = req.body;
+  let getquizzesquery = await pool.query('SELECT word FROM quiz WHERE user_id = $1', [userid]);
+  res.json(getquizzesquery.rows);
 });
 
 app.get('/random-word', (req, res) => {
@@ -415,7 +432,7 @@ app.listen(PORT, host, () => {
 });
 
 function getRandomWordList() {
-    let reqUrl = `https://wordsapiv1.p.rapidapi.com/words/?limit=100&page=100&frequencyMin=3.35`;
+    let reqUrl = `https://wordsapiv1.p.rapidapi.com/words/?letterPattern=%5Ba-z%5D%2B&limit=100&page=2&frequencyMin=4.00`;
     axios({
       url: reqUrl,
       headers: {
@@ -423,10 +440,11 @@ function getRandomWordList() {
         'x-rapidapi-host': 'wordsapiv1.p.rapidapi.com'
       }
     }).then(response => {
-      console.log(response.data.results.data);
+      for(const element of response.data.results.data)
+      stream.write("\"" + element + "\", ", function (err) {
+        if (err) throw err;
+      });
     }).catch(error => {
       console.error(error);
     });
 };
-
-getRandomWordList();
