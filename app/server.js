@@ -1,6 +1,4 @@
 const keys = require("./keys.json");
-const apiKey = keys["dictionary"];
-const words = require("./sample-words.json");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const express = require('express');
@@ -8,6 +6,7 @@ let cookieParser = require("cookie-parser");
 const app = express();
 const path = require('path');
 const axios = require("axios");
+const words = require("./sample-words.json");
 const PORT = 3000;
 let { Pool } = require("pg");
 process.chdir(__dirname);
@@ -40,13 +39,6 @@ let cookieOptions = {
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-
-app.get('/random-word', (req, res) => {
-  let index = Math.floor(Math.random() * words.length);
-  res.set('Content-Type', 'text/plain');
-  res.send(words[index]);
-});
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -133,10 +125,40 @@ app.post('/userid', async (req, res) => {
 });
 
 app.post('/insert-quiz', async (req, res) => {
-  const { userid, successes, attempts } = req.body;
-  let insertquizquery = await pool.query('INSERT INTO quiz (user_id, successes, attempts) VALUES ($1, $2, $3)', [userid, successes, attempts]);
-  console.log(insertquizquery);
+  const { userid, word, lang, successes, attempts } = req.body;
+  let insertquizquery = await pool.query('INSERT INTO quiz (user_id, word, lang, successes, attempts) VALUES ($1, $2, $3, $4, $5)', [userid, word, lang, successes, attempts]);
   res.end();
+});
+
+app.post('/get-recent-quiz', async (req, res) => {
+  const { userid } = req.body;
+  let getquizzesquery = await pool.query('SELECT * FROM quiz WHERE user_id = $1 ORDER BY taken_at DESC LIMIT 1', [userid]);
+  res.json(getquizzesquery.rows);
+});
+
+app.post('/get-quizzes', async (req, res) => {
+  const { userid } = req.body;
+  let getquizzesquery = await pool.query('SELECT * FROM quiz WHERE user_id = $1', [userid]);
+  res.json(getquizzesquery.rows);
+});
+
+app.post('/get-quiz-words', async (req, res) => {
+  const { userid } = req.body;
+  let getquizzesquery = await pool.query('SELECT word FROM quiz WHERE user_id = $1', [userid]);
+  res.json(getquizzesquery.rows);
+});
+
+app.post('/get-quiz-performance', async (req, res) => {
+  const { userid } = req.body;
+  let getsuccessesquery = await pool.query('SELECT SUM(successes) FROM quiz WHERE user_id = $1', [userid]);
+  let getattemptsquery = await pool.query('SELECT SUM(attempts) FROM quiz WHERE user_id = $1', [userid]);
+  res.json({successes: getsuccessesquery.rows[0].sum, attempts: getattemptsquery.rows[0].sum});
+});
+
+app.get('/random-word', (req, res) => {
+  let index = Math.floor(Math.random() * words.length);
+  res.set('Content-Type', 'text/plain');
+  res.send(words[index]);
 });
 
 app.get('/mwd/:word', (req, res) => {
@@ -415,3 +437,21 @@ app.get('/imageGame', isAuthenticated, (req, res) => {
 app.listen(PORT, host, () => {
   console.log(`Server is running on http://${host}:${PORT}`);
 });
+
+function getRandomWordList() {
+    let reqUrl = `https://wordsapiv1.p.rapidapi.com/words/?letterPattern=%5Ba-z%5D%2B&limit=100&page=2&frequencyMin=4.00`;
+    axios({
+      url: reqUrl,
+      headers: {
+        'x-rapidapi-key': '6a7299b60cmsh45fba08f2cada49p1468cejsnb2307733b40c',
+        'x-rapidapi-host': 'wordsapiv1.p.rapidapi.com'
+      }
+    }).then(response => {
+      for(const element of response.data.results.data)
+      stream.write("\"" + element + "\", ", function (err) {
+        if (err) throw err;
+      });
+    }).catch(error => {
+      console.error(error);
+    });
+};
