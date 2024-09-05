@@ -63,7 +63,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const { successes, attempts } = await response3.json(); 
     let quizpercentage = document.getElementById('quiz-percentage');
-    quizpercentage.textContent = successes/parseFloat(attempts) * 100 + '\%';
+    if(successes && attempts)
+        quizpercentage.textContent = successes/parseFloat(attempts) * 100 + '\%';
+    else
+    quizpercentage.textContent = 'No quizzes taken yet !';
     } catch (error) {
     console.error(error.message);
     return null;
