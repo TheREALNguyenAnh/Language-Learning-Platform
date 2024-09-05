@@ -1,30 +1,41 @@
-
 async function main() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let targetlang = urlParams.get('lang');
     let userid = await getUserID();
     let lastQuiz = await getRecentQuiz(userid);
-    let previousQuizWords = [];
-    if (lastQuiz.length > 0) {
-        const timestamp = Date.now();
-        const lastQuizTimestamp = Date.parse(lastQuiz[0].taken_at);
-        if (timestamp - lastQuizTimestamp < 86400000) {
-            window.location.href = 'quizcd.html'
-        }
-        else {
-            let rows = await getPreviousWords(userid);
-            for (const row of rows) {
-                previousQuizWords.push(row.word);
-            }
-        }
-    }
-    console.log(previousQuizWords);
-    let quizOptions = [];
     let quizWord = await getWord();
-    while (previousQuizWords.includes(quizWord)) {
-        quizWord = await getWord();
+    if (lastQuiz.length == 0) {
+        let hh = document.getElementById('hh');
+        hh.textContent = 'Let\'s add a new word to your vocabulary';
+        takeQuiz(quizWord, targetlang, userid, 'quizcd.html');
     }
+    const timestamp = Date.now();
+    const lastQuizTimestamp = Date.parse(lastQuiz[0].taken_at);
+    console.log(timestamp - lastQuizTimestamp);
+    /*if (timestamp - lastQuizTimestamp < 86400000) {
+        window.location.href = 'quizcd.html'
+    }*/
+    if (window.location.href.indexOf('requiz') == -1) {
+        let previousWords = [];
+        let requestData = await getPreviousWords(userid);
+        for (const entry of requestData) {
+            previousWords.push(entry.word);
+        }
+        while (previousWords.includes(quizWord)) {
+            quizWord = await getWord();
+        }
+        takeQuiz(quizWord, lastQuiz[0].lang, userid, 'quizcd.html');
+    }
+    else {
+        takeQuiz(lastQuiz[0].word, lastQuiz[0].lang, userid, "quiz.html?lang=" + lastQuiz[0].lang);
+    }
+};
+
+async function takeQuiz(quizWord, targetlang, userid, redirect) {
     let succeses = 0;
     let attempts = 0;
-    
+    let quizOptions = [];
+
     let header = document.getElementById('header');
     let str = header.textContent.slice(0, 25) + quizWord + header.textContent.slice(25);
     header.textContent = str;
@@ -35,7 +46,7 @@ async function main() {
             quizOptions.push(quizOption);
     };
 
-    let quizOptionsTranslated = await translateWords(quizOptions);
+    let quizOptionsTranslated = await translateWords(quizOptions, targetlang);
     let quizWordTranslated = quizOptionsTranslated[0].translatedText;
     let index = quizOptionsTranslated.length;
     while (index != 0) {
@@ -62,9 +73,9 @@ async function main() {
             this.style.backgroundColor = '#5bd123';
             succeses++;
             attempts++;
-            insertQuiz(userid, quizWord, succeses, attempts);
+            insertQuiz(userid, quizWord, targetlang, succeses, attempts);
             setTimeout(() => { 
-                window.location.href = 'quizcd.html'
+                window.location.href = redirect;
             }, 1000);
         }
         else {
@@ -94,13 +105,11 @@ async function getWord() {
     }
 };
 
-async function translateWords(quizOptions) {
-    const urlParams = new URLSearchParams(window.location.search);
-    let targetLang = urlParams.get('lang');
+async function translateWords(quizOptions, targetlang) {
     try {
         const response = await fetch('/translate', {
             method: 'POST',
-            body: JSON.stringify({q: quizOptions, source: 'en', target: targetLang, format: 'text'}),
+            body: JSON.stringify({q: quizOptions, source: 'en', target: targetlang, format: 'text'}),
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -183,11 +192,11 @@ async function getRecentQuiz(userid) {
     }
 };
 
-async function insertQuiz(userid, word, successes, attempts) {
+async function insertQuiz(userid, word, lang, successes, attempts) {
     try {
         const response = await fetch('/insert-quiz', {
             method: 'POST',
-            body: JSON.stringify({userid: userid, word: word, successes: successes, attempts: attempts}),
+            body: JSON.stringify({userid: userid, word: word, lang: lang, successes: successes, attempts: attempts}),
             headers: {
                 'Content-Type': 'application/json'
             },

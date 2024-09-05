@@ -125,8 +125,8 @@ app.post('/userid', async (req, res) => {
 });
 
 app.post('/insert-quiz', async (req, res) => {
-  const { userid, word, successes, attempts } = req.body;
-  let insertquizquery = await pool.query('INSERT INTO quiz (user_id, word, successes, attempts) VALUES ($1, $2, $3, $4)', [userid, word, successes, attempts]);
+  const { userid, word, lang, successes, attempts } = req.body;
+  let insertquizquery = await pool.query('INSERT INTO quiz (user_id, word, lang, successes, attempts) VALUES ($1, $2, $3, $4, $5)', [userid, word, lang, successes, attempts]);
   res.end();
 });
 
@@ -146,6 +146,14 @@ app.post('/get-quiz-words', async (req, res) => {
   const { userid } = req.body;
   let getquizzesquery = await pool.query('SELECT word FROM quiz WHERE user_id = $1', [userid]);
   res.json(getquizzesquery.rows);
+});
+
+app.post('/get-quiz-performance', async (req, res) => {
+  const { userid } = req.body;
+  let getsuccesesquery = await pool.query('SELECT SUM(successes) FROM quiz WHERE user_id = $1', [userid]);
+  let getattemptsquery = await pool.query('SELECT SUM(attempts) FROM quiz WHERE user_id = $1', [userid]);
+  console.log(getsuccesesquery);
+  //res.json(getsuccesesquery.rows[0]);
 });
 
 app.get('/random-word', (req, res) => {
