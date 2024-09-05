@@ -233,23 +233,14 @@ app.get('/fetch-photo', async (req, res) => {
   }
 });
 
-const artData = [
-  { artid: "cow"},
-  { artid: "horse"},
-  { artid: "dog"},
-  { artid: "bird"}
-];
-
-app.get('/get-art', (req, res) => {
-  const randomIndex = Math.floor(Math.random() * artData.length);
-  res.json(artData[randomIndex]);
-});
 
 let games = {};
 
-app.post('/start-hangman', (req, res) => {
+app.post('/start-hangman', async (req, res) => {
+  try {
     const { userId } = req.body;
-    const word = getRandomWord();
+    const response = await axios.get('http://localhost:3000/random-word'); // Make sure the URL matches your server settings
+    const word = response.data;
     const gameId = Date.now(); 
 
     games[gameId] = {
@@ -262,6 +253,10 @@ app.post('/start-hangman', (req, res) => {
     };
 
     res.json({ gameId, word });
+  } catch (error) {
+    console.error('Error starting hangman game:', error);
+    res.status(500).send('Failed to start the game.');
+  }
 });
 
 app.post('/update-hangman-progress', async (req, res) => {

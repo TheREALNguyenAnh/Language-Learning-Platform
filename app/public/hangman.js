@@ -4,38 +4,7 @@ const keyboardDiv = document.querySelector(".keyboard");
 const hangmanImage = document.querySelector(".hangman-box img");
 const gameModal = document.querySelector(".game-modal");
 const playAgainBtn = gameModal.querySelector("button");
-const wordList = [
-    { word: "apple" },
-    { word: "banana" },
-    { word: "orange" },
-    { word: "grape" },
-    { word: "lemon" },
-    { word: "pear" },
-    { word: "peach" },
-    { word: "melon" },
-    { word: "berry" },
-    { word: "plum" },
-    { word: "kiwi" },
-    { word: "mango" },
-    { word: "bread" },
-    { word: "water" },
-    { word: "juice" },
-    { word: "honey" },
-    { word: "pizza" },
-    { word: "sugar" },
-    { word: "salad" },
-    { word: "sauce" },
-    { word: "carrot" },
-    { word: "onion" },
-    { word: "pepper" },
-    { word: "tomato" },
-    { word: "candy" },
-    { word: "cookie" },
-    { word: "cheese" },
-    { word: "bread" },
-    { word: "pasta" },
-    { word: "fruit" },
-];
+
 
 let currentWord, correctLetters, wrongGuessCount, gameId;
 const maxGuesses = 6;
