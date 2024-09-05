@@ -126,12 +126,6 @@ section a:hover {
   color: #666;
 }
 
-/* Logout Button */
-/*.container {
-  margin-top: 30px;
-  text-align: center;
-}
-*/
 #logoutButton {
   background-color: #333;
   color: #fff;
@@ -147,7 +141,8 @@ section a:hover {
   transform: scale(1.05);
 }
 
-/* Importing Google font - Open Sans */
+
+
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap");
 * {
     margin: 0;
@@ -217,6 +212,24 @@ section a:hover {
     margin-top: 40px;
     justify-content: center;
 }
+
+.styled-button {
+  background: #5E63BA;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.styled-button:hover {
+  background: #8286c9;
+  transform: translateY(-2px);
+}
 :where(.game-modal, .keyboard) button {
     color: #fff;
     border: none;
@@ -228,6 +241,7 @@ section a:hover {
     text-transform: uppercase;
     background: #5E63BA;
 }
+
 .keyboard button {
     padding: 7px;
     width: calc(100% / 9 - 5px);
@@ -239,6 +253,7 @@ section a:hover {
 :where(.game-modal, .keyboard) button:hover {
     background: #8286c9;
 }
+
 .game-modal {
     position: fixed;
     top: 0;
@@ -326,4 +341,46 @@ section a:hover {
     .game-modal button {
         padding: 10px 18px;
     }
+}
+
+.rules-modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.rules-modal .modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.rules-modal .close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.rules-modal .close:hover,
+.rules-modal .close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rules-modal p {
+  margin: 10px 0;
 }
