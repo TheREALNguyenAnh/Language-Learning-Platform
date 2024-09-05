@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hangman Game</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="hangman.js" defer></script>
 </head>
 <body>
+    <nav>
+        <button class="styled-button" onclick="window.location.href='home.html'">Go Back</button>
+    </nav>
     <div class="game-modal">
         <div class="content">
             <img src="#" alt="gif">
@@ -27,5 +29,33 @@
             <div class="keyboard"></div>
         </div>
     </div>
+    <nav>
+        <button class="styled-button" onclick="document.getElementById('rulesModal').style.display='block'">Rules of the Game</button>
+    </nav>
+    
+    <div id="rulesModal" class="rules-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Game Rules</h2>
+                <span class="close" onclick="document.getElementById('rulesModal').style.display='none'">&times;</span>
+            </div>
+            <p>1. A word will be selected at random.</p>
+            <p>2. Your goal is to guess the word, one letter at a time.</p>
+            <p>3. Click the letters on the keyboard to make guesses.</p>
+            <p>4. Each incorrect guess will bring you closer to losing the game.</p>
+            <p>5. If you guess all the letters correctly, you win!</p>
+        </div>
+    </div>
+    <script src="hangman.js" defer></script>
+
+    <script>
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('rulesModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
