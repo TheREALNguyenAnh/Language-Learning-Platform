@@ -7,31 +7,38 @@
   <link rel="stylesheet" href="homepage.css">
 </head>
 <body>
- 
+  <div class="language-switch">
+    <button onclick="window.location.href='/loggedin'">English</button>
+    <button onclick="window.location.href='/homeEs'">Español</button>
+    <button onclick="window.location.href='/homeFR'">Français</button>
+    <button onclick="window.location.href='/homeDE'">Deutsch</button>
+  </div>
+
   <main>
     <h1 id="welcomemessage">Welcome to Dragonlingo!</h1>
+
     <section id="dashboard">
         <h2><a href="#dashboard">Dashboard</a></h2>
         <p>Access your latest lessons, upcoming tests, and recent achievements here.</p>
     </section>
     
     <section id="courses">
-        <h2><a href="#courses">Quizes</a></h2>
+        <h2><a href="#courses">Quizzes</a></h2>
         <div class="course-list">
             <div class="course">
-              <a href ="/quiz.html?lang=es">
+              <a href="/quiz.html?lang=es">
                 <h3>Spanish</h3>
                 <p>Take quiz</p>
               </a>
             </div>
             <div class="course">
-              <a href ="/quiz.html?lang=fr">
+              <a href="/quiz.html?lang=fr">
                 <h3>French</h3>
                 <p>Take quiz</p>
               </a>
             </div>
             <div class="course">
-              <a href ="/quiz.html?lang=de">
+              <a href="/quiz.html?lang=de">
                 <h3>German</h3>
                 <p>Take quiz</p>
               </a>
@@ -48,15 +55,19 @@
         </div>
     </section>
 
+    <div class="button-container">
+      <button id="gameButton">Play Flashcard Game</button>
+      <button id="hangman">Play Hangman</button>
+      <button id="imageGame">Play Image Game</button>
+    </div>
+
     <section id="profile">
         <h2><a href="#profile">Profile</a></h2>
         <p>Update your personal information and learning preferences here.</p>
     </section>
+
     <div class="container">
-      <button id="gameButton">Play Flashcard Game</button>
       <button id="logoutButton">Log Out</button>
-      <button id="hangman">Play Hangman</button>
-      <button id="imageGame">Play Image Game</button>
     </div>
   </main>
   <script src="homeScript.js"></script>

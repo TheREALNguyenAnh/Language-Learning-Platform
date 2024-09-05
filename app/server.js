@@ -412,6 +412,16 @@ app.get('/imageGame', isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'image_game.html'));
 });
 
+app.get('/homeES', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'homeES.html'));
+});
+app.get('/homeFR', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'homeFR.html'));
+});
+app.get('/homeDE', isAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'homeDE.html'));
+});
+
 app.listen(PORT, host, () => {
   console.log(`Server is running on http://${host}:${PORT}`);
 });

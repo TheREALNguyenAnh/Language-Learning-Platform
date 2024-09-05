@@ -1,3 +1,4 @@
+
 body {
   font-family: 'Arial', sans-serif;
   margin: 0;
@@ -124,10 +125,38 @@ section a:hover {
 }
 
 /* Logout Button */
-.container {
-  margin-top: 30px;
-  text-align: center;
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 40px 0;
 }
+
+.button-container button {
+  background-color: #313131;
+  color: #fff;
+  border: none;
+  padding: 20px 40px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.button-container button:hover {
+  background-color: #707070;
+  transform: scale(1.05);
+}
+
+/* Performance Stats */
+#performance-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  font-size: 1.1rem;
+}
+
+/* Logout Button */
 #logoutButton {
   background-color: #333;
   color: #fff;
@@ -136,6 +165,7 @@ section a:hover {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-top: auto;
 }
 
 #logoutButton:hover {
@@ -143,3 +173,35 @@ section a:hover {
   transform: scale(1.05);
 }
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  main {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  .course-list {
+    flex-direction: column;
+  }
+
+  .course {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .button-container {
+    flex-direction: column;
+  }
+
+  .button-container button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
