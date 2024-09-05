@@ -150,10 +150,9 @@ app.post('/get-quiz-words', async (req, res) => {
 
 app.post('/get-quiz-performance', async (req, res) => {
   const { userid } = req.body;
-  let getsuccesesquery = await pool.query('SELECT SUM(successes) FROM quiz WHERE user_id = $1', [userid]);
+  let getsuccessesquery = await pool.query('SELECT SUM(successes) FROM quiz WHERE user_id = $1', [userid]);
   let getattemptsquery = await pool.query('SELECT SUM(attempts) FROM quiz WHERE user_id = $1', [userid]);
-  console.log(getsuccesesquery);
-  //res.json(getsuccesesquery.rows[0]);
+  res.json({successes: getsuccessesquery.rows[0].sum, attempts: getattemptsquery.rows[0].sum});
 });
 
 app.get('/random-word', (req, res) => {
