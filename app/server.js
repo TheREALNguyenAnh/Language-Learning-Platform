@@ -356,10 +356,6 @@ try {
 }
 });
 
-const getRandomWord = () => {
-  const words = ['apple', 'banana', 'orange', 'grape', 'lemon'];
-  return words[Math.floor(Math.random() * words.length)];
-};
 
 app.post('/log-performance', isAuthenticated, async (req, res) => {
   const { correctGuesses, incorrectGuesses } = req.body;
@@ -397,6 +393,40 @@ app.get('/performance-stats', isAuthenticated, async (req, res) => {
   }
 });
 
+
+app.get('/performance-hangman', isAuthenticated, async (req, res) => {
+  try {
+      const userId = req.user.id;
+      const result = await pool.query('SELECT games_won, games_lost FROM hangman_progress WHERE id = $1', [userId]);
+
+      if (result.rows.length > 0) {
+          const { games_won, games_lost } = result.rows[0];
+          res.json({ correctMatches: games_won, incorrectMatches: games_lost });
+      } else {
+          res.status(404).json({ message: 'User not found' });
+      }
+  } catch (error) {
+      console.error('Error fetching performance stats:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.get('/performance-picture', isAuthenticated, async (req, res) => {
+  try {
+      const userId = req.user.id;
+      const result = await pool.query('SELECT games_won, games_lost FROM imagegame_progress WHERE id = $1', [userId]);
+
+      if (result.rows.length > 0) {
+          const { games_won, games_lost } = result.rows[0];
+          res.json({ correctMatches: games_won, incorrectMatches: games_lost });
+      } else {
+          res.status(404).json({ message: 'User not found' });
+      }
+  } catch (error) {
+      console.error('Error fetching performance stats:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
 // Create a new flashcard set
 app.post('/flashcard-sets', isAuthenticated, async (req, res) => {
   // Logic to create a new flashcard set
