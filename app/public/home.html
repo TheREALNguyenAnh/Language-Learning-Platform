@@ -8,10 +8,10 @@
 </head>
 <body>
   <div class="language-switch">
-    <button onclick="window.location.href='/loggedin'">English</button>
-    <button onclick="window.location.href='/homeEs'">Español</button>
-    <button onclick="window.location.href='/homeFR'">Français</button>
-    <button onclick="window.location.href='/homeDE'">Deutsch</button>
+    <button id="lang-en">English</button>
+    <button id="lang-es">Español</button>
+    <button id="lang-fr">Français</button>
+    <button id="lang-de">Deutsch</button>
   </div>
 
   <main>
@@ -20,54 +20,35 @@
     <section id="dashboard">
       <h2><a href="#dashboard">Dashboard</a></h2>
       <div class="course-list">
-        <div class="course">
-          <a href ="/flashcards.html">
-            <h3>Flashcards</h3>
-            <p>Take quiz</p>
-          </a>
+        <div class="course" href ="/flashcards.html">
+          <a href ="/flashcards.html"><h3>Flashcards</h3><p>Learn words and their definitions</p></a>
         </div>
         <div class="course">
-          <a href ="/hangman.html">
-            <h3>Hangman</h3>
-            <p>Take quiz</p>
-          </a>
+          <a href ="/hangman.html"><h3>Hangman</h3><p>Play Hangman Game</p></a>
         </div>
         <div class="course">
-          <a href ="/image_game.html">
-            <h3>Image-Word Game</h3>
-            <p>Take quiz</p>
-          </a>
+          <a href ="/image_game.html"><h3>Picture-Word Game</h3><p>Guess a word that matches a picture</p></a>
         </div>
       </div>
     </section>
     
     <section id="courses">
-        <h2><a href="#courses">Daily Quizzes</a></h2>
-        <div class="course-list">
-            <div class="course">
-              <a href ="/requiz.html?lang=es">
-                <h3>Spanish</h3>
-                <p>Take quiz</p>
-              </a>
-            </div>
-            <div class="course">
-              <a href ="/requiz.html?lang=fr">
-                <h3>French</h3>
-                <p>Take quiz</p>
-              </a>
-            </div>
-            <div class="course">
-              <a href ="/requiz.html?lang=de">
-                <h3>German</h3>
-                <p>Take quiz</p>
-              </a>
-            </div>
+      <h2><a href="#courses">Daily Quizzes</a></h2>
+      <div class="course-list">
+        <div class="course">
+          <a href ="/requiz.html?lang=es"><h3>Spanish</h3><p>Take quiz</p></a>
         </div>
+        <div class="course">
+          <a href ="/requiz.html?lang=fr"><h3>French</h3><p>Take quiz</p></a>
+        </div>
+        <div class="course">
+          <a href ="/requiz.html?lang=de"><h3>German</h3><p>Take quiz</p></a>
+        </div>
+      </div>
     </section>
 
     <section id="performances">
         <h2><a href="#performance">Performance</a></h2>
-        
         <div class="performance-list">
           <div class="performance">
             <h4>Track your flashcard game performance:</h4>
@@ -80,18 +61,17 @@
             <h4>Quiz Accuracy</h4>
             <p id="quiz-percentage"></p>
           </div>
+          <div class ="performance">
+            <h4>Hangman performance</h4>
+            <p>Correct Guesses: <span id="correctHangmanGuesses">0</span></p>
+            <p>Incorrect Guesses: <span id="incorrectHangmanGuesses">0</span></p>
+          </div>
+          <div class ="performance">
+            <h4>Picture-Word performance</h4>
+            <p>Correct Guesses: <span id="correctPictureGuesses">0</span></p>
+            <p>Incorrect Guesses: <span id="incorrectPictureGuesses">0</span></p>
+          </div>
         </div>
-    </section>
-
-    <div class="button-container">
-      <button id="gameButton">Play Flashcard Game</button>
-      <button id="hangman">Play Hangman</button>
-      <button id="imageGame">Play Image Game</button>
-    </div>
-
-    <section id="profile">
-        <h2><a href="#profile">Profile</a></h2>
-        <p>Update your personal information and learning preferences here.</p>
     </section>
 
     <div class="container">

@@ -1,3 +1,5 @@
+const fs = require('fs');
+const homepagehtml = fs.readFileSync("./app/public/home.html", "utf-8");
 const keys = require("./keys.json");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -99,10 +101,33 @@ function isAuthenticated(req, res, next) {
   });
 }
 
+app.post('/set-lang', (req, res) => {
+  let { lang } = req.body;
+  return res.cookie('lang', lang, cookieOptions).end();
+});
 
 app.get('/loggedin', isAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'home.html'));
-  console.log('Red Spy in Base');
+  let { lang } = req.cookies;
+  if(lang === undefined) {
+    return res.cookie('lang', 'en', cookieOptions).send(homepagehtml);
+  }
+  const body = {
+    q: homepagehtml,
+    target: lang
+  };
+  let reqUrl = `https://translation.googleapis.com/language/translate/v2?key=${keys.translate}`;
+  axios({
+    method: 'post',
+    url: reqUrl,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: body
+  }).then(response => {
+    return res.send(response.data.data.translations[0].translatedText);
+  }).catch(error => {
+    console.log(error);
+  });
 });
 
 app.get('/user-data', isAuthenticated, (req, res) => {
@@ -139,7 +164,6 @@ app.post('/get-recent-quiz', async (req, res) => {
 app.post('/get-quizzes', async (req, res) => {
   const { userid } = req.body;
   let getquizzesquery = await pool.query('SELECT * FROM quiz WHERE user_id = $1', [userid]);
-  console.log(getquizzesquery);
   res.json(getquizzesquery);
 });
 
@@ -357,10 +381,6 @@ try {
 }
 });
 
-const getRandomWord = () => {
-  const words = ['apple', 'banana', 'orange', 'grape', 'lemon'];
-  return words[Math.floor(Math.random() * words.length)];
-};
 
 app.post('/log-performance', isAuthenticated, async (req, res) => {
   const { correctGuesses, incorrectGuesses } = req.body;
@@ -398,6 +418,40 @@ app.get('/performance-stats', isAuthenticated, async (req, res) => {
   }
 });
 
+
+app.get('/performance-hangman', isAuthenticated, async (req, res) => {
+  try {
+      const userId = req.user.id;
+      const result = await pool.query('SELECT games_won, games_lost FROM hangman_progress WHERE id = $1', [userId]);
+
+      if (result.rows.length > 0) {
+          const { games_won, games_lost } = result.rows[0];
+          res.json({ correctMatches: games_won, incorrectMatches: games_lost });
+      } else {
+          res.status(404).json({ message: 'User not found' });
+      }
+  } catch (error) {
+      console.error('Error fetching performance stats:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.get('/performance-picture', isAuthenticated, async (req, res) => {
+  try {
+      const userId = req.user.id;
+      const result = await pool.query('SELECT games_won, games_lost FROM imagegame_progress WHERE id = $1', [userId]);
+
+      if (result.rows.length > 0) {
+          const { games_won, games_lost } = result.rows[0];
+          res.json({ correctMatches: games_won, incorrectMatches: games_lost });
+      } else {
+          res.status(404).json({ message: 'User not found' });
+      }
+  } catch (error) {
+      console.error('Error fetching performance stats:', error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
 // Create a new flashcard set
 app.post('/flashcard-sets', isAuthenticated, async (req, res) => {
   // Logic to create a new flashcard set
