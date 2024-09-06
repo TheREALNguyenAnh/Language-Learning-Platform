@@ -139,7 +139,8 @@ app.post('/get-recent-quiz', async (req, res) => {
 app.post('/get-quizzes', async (req, res) => {
   const { userid } = req.body;
   let getquizzesquery = await pool.query('SELECT * FROM quiz WHERE user_id = $1', [userid]);
-  res.json(getquizzesquery.rows);
+  console.log(getquizzesquery);
+  res.json(getquizzesquery);
 });
 
 app.post('/get-quiz-words', async (req, res) => {
