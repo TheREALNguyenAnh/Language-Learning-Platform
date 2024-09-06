@@ -1,3 +1,5 @@
+const fs = require('fs');
+const homepagehtml = fs.readFileSync("./app/public/home.html", "utf-8");
 const keys = require("./keys.json");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -99,10 +101,33 @@ function isAuthenticated(req, res, next) {
   });
 }
 
+app.post('/set-lang', (req, res) => {
+  let { lang } = req.body;
+  return res.cookie('lang', lang, cookieOptions).end();
+});
 
 app.get('/loggedin', isAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'home.html'));
-  console.log('Red Spy in Base');
+  let { lang } = req.cookies;
+  if(lang === undefined) {
+    return res.cookie('lang', 'en', cookieOptions).send(homepagehtml);
+  }
+  const body = {
+    q: homepagehtml,
+    target: lang
+  };
+  let reqUrl = `https://translation.googleapis.com/language/translate/v2?key=${keys.translate}`;
+  axios({
+    method: 'post',
+    url: reqUrl,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: body
+  }).then(response => {
+    return res.send(response.data.data.translations[0].translatedText);
+  }).catch(error => {
+    console.log(error);
+  });
 });
 
 app.get('/user-data', isAuthenticated, (req, res) => {
@@ -139,7 +164,7 @@ app.post('/get-recent-quiz', async (req, res) => {
 app.post('/get-quizzes', async (req, res) => {
   const { userid } = req.body;
   let getquizzesquery = await pool.query('SELECT * FROM quiz WHERE user_id = $1', [userid]);
-  res.json(getquizzesquery.rows);
+  res.json(getquizzesquery);
 });
 
 app.post('/get-quiz-words', async (req, res) => {

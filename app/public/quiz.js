@@ -12,9 +12,9 @@ async function main() {
     const timestamp = Date.now();
     const lastQuizTimestamp = Date.parse(lastQuiz[0].taken_at);
     console.log(timestamp - lastQuizTimestamp);
-    /*if (timestamp - lastQuizTimestamp < 86400000) {
+    if (timestamp - lastQuizTimestamp < 86400000) {
         window.location.href = 'quizcd.html'
-    }*/
+    }
     if (window.location.href.indexOf('requiz') == -1) {
         let previousWords = [];
         let requestData = await getPreviousWords(userid);
