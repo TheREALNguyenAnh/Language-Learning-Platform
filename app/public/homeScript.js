@@ -30,6 +30,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   try {
+       const performanceResponse = await fetch('/performance-hangman');
+       if (performanceResponse.ok) {
+        const { correctMatches, incorrectMatches } = await performanceResponse.json();
+
+        document.getElementById('correctHangmanGuesses').textContent = correctMatches;
+        document.getElementById('incorrectHangmanGuesses').textContent = incorrectMatches;
+    } else {
+        console.error('Failed to fetch performance stats');
+    }
+  } catch (error) {
+      console.error('Error fetching performance stats:', error);
+  }
+
+  try {
+       const performanceResponse = await fetch('/performance-picture');
+       if (performanceResponse.ok) {
+       const { correctMatches, incorrectMatches } = await performanceResponse.json();
+
+        document.getElementById('correctPictureGuesses').textContent = correctMatches;
+        document.getElementById('incorrectPictureGuesses').textContent = incorrectMatches;
+    } else {
+        console.error('Failed to fetch performance stats');
+    }
+  } catch (error) {
+    console.error('Error fetching performance stats:', error);
+  }
+
+
+  try {
     const response = await fetch('/user-data', {
         method: 'GET',
         credentials: 'include',
@@ -85,15 +114,3 @@ document.getElementById('logoutButton').addEventListener('click', async () => {
       console.error('Logout failed');
   }
 });
-
-document.getElementById('gameButton').addEventListener('click', function() {
-  window.location.href = '/flashcards-game';
-});
-
-document.getElementById('hangman').addEventListener('click', function() {
-    window.location.href = '/hangman';
-  });
-
-  document.getElementById('imageGame').addEventListener('click', function() {
-    window.location.href = '/imageGame';
-  });
