@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node app/server.js",
     "setup": "fly postgres connect -a language-learning-platform-db < setup.sql",
     "start:dev": "env-cmd node app/server.js",
@@ -23,6 +23,7 @@
     "pg": "^8.12.0"
   },
   "devDependencies": {
-    "@flydotio/dockerfile": "^0.4.11"
+    "@flydotio/dockerfile": "^0.4.11",
+    "jest": "^27.0.0"
   }
 }
