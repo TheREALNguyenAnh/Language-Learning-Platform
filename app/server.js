@@ -80,7 +80,7 @@ app.post('/signup', async (req, res) => {
   } catch (error) {
     console.error('Database error:', error);
     res.status(500).send({ message: 'Database error' });
-    console.log(error);
+    console.error(error);
   }
 });
 
@@ -126,7 +126,7 @@ app.get('/loggedin', isAuthenticated, (req, res) => {
   }).then(response => {
     return res.send(response.data.data.translations[0].translatedText);
   }).catch(error => {
-    console.log(error);
+    console.error(error);
   });
 });
 
@@ -209,7 +209,7 @@ app.get('/mwd/:word', (req, res) => {
     let audiourl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdirectory}/${audio}.mp3`;
     res.json({'shortdef': shortdef, 'audiourl': audiourl});
   }).catch(error => {
-    console.log(error);
+    console.error(error);
   })
 });
 
@@ -226,7 +226,7 @@ app.post('/translate', (req, res) => {
   }).then(response => {
     res.send(response.data);
   }).catch(error => {
-    console.log(error);
+    console.error(error);
   });
 });
 
@@ -292,7 +292,7 @@ app.post('/update-hangman-progress', async (req, res) => {
           SET games_played = games_played + 1,
               ${isVictory ? 'games_won = games_won + 1' : 'games_lost = games_lost + 1'},
               last_game = CURRENT_TIMESTAMP
-          WHERE username = $1
+          WHERE user_id = $1
           RETURNING *`,
           [userId]
       );
@@ -300,7 +300,7 @@ app.post('/update-hangman-progress', async (req, res) => {
       if (result.rowCount === 0) {
           // If no progress record exists for the user, create one
           await pool.query(
-              `INSERT INTO hangman_progress (username, games_played, games_won, games_lost)
+              `INSERT INTO hangman_progress (user_id, games_played, games_won, games_lost)
                VALUES ($1, 1, $2, $3)`,
               [userId, isVictory ? 1 : 0, isVictory ? 0 : 1]
           );
@@ -360,7 +360,7 @@ try {
         SET games_played = games_played + 1,
             ${isVictory ? 'games_won = games_won + 1' : 'games_lost = games_lost + 1'},
             last_game = CURRENT_TIMESTAMP
-        WHERE username = $1
+        WHERE user_id = $1
         RETURNING *`,
         [userId]
     );
@@ -368,7 +368,7 @@ try {
     if (result.rowCount === 0) {
         // If no progress record exists for the user, create one
         await pool.query(
-            `INSERT INTO imagegame_progress (username, games_played, games_won, games_lost)
+            `INSERT INTO imagegame_progress (user_id, games_played, games_won, games_lost)
              VALUES ($1, 1, $2, $3)`,
             [userId, isVictory ? 1 : 0, isVictory ? 0 : 1]
         );
@@ -422,7 +422,7 @@ app.get('/performance-stats', isAuthenticated, async (req, res) => {
 app.get('/performance-hangman', isAuthenticated, async (req, res) => {
   try {
       const userId = req.user.id;
-      const result = await pool.query('SELECT games_won, games_lost FROM hangman_progress WHERE id = $1', [userId]);
+      const result = await pool.query('SELECT games_won, games_lost FROM hangman_progress WHERE user_id = $1', [userId]);
 
       if (result.rows.length > 0) {
           const { games_won, games_lost } = result.rows[0];
@@ -439,7 +439,7 @@ app.get('/performance-hangman', isAuthenticated, async (req, res) => {
 app.get('/performance-picture', isAuthenticated, async (req, res) => {
   try {
       const userId = req.user.id;
-      const result = await pool.query('SELECT games_won, games_lost FROM imagegame_progress WHERE id = $1', [userId]);
+      const result = await pool.query('SELECT games_won, games_lost FROM imagegame_progress WHERE user_id = $1', [userId]);
 
       if (result.rows.length > 0) {
           const { games_won, games_lost } = result.rows[0];

@@ -16,21 +16,32 @@ const fetchPhoto = async (searchTerm) => {
     }
 };
 
-const getUserId = async () => {
+async function getUserID() {
     try {
         const response = await fetch('/user-data', {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            credentials: 'include',
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        if(!response.ok) {
+            throw new Error(`Response status: ${response.status}`)
         }
+        const { username } = await response.json();
 
-        const data = await response.json();
-        return data.username; 
+        const response2 = await fetch('/userid', {
+            method: 'POST',
+            body: JSON.stringify({username: username}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        const { userid } = await response2.json();
+        if(!response2.ok) {
+            throw new Error(`Response status: ${response.status}`)
+        }
+        return userid;
     } catch (error) {
-        console.error('Error fetching user ID:', error);
+        console.error(error.message);
+        return null;
     }
 };
 
@@ -66,7 +77,7 @@ async function loadArt() {
 } 
 
 async function checkAnswer(button) {
-    const userId = await getUserId();
+    const userId = await getUserID();
     const isVictory = button.textContent === correctAnswer;
     if (isVictory) {
         alert('Correct!');

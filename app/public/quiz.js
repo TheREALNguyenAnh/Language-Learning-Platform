@@ -3,19 +3,20 @@ async function main() {
     let targetlang = urlParams.get('lang');
     let userid = await getUserID();
     let lastQuiz = await getRecentQuiz(userid);
+    console.log(lastQuiz);
     let quizWord = await getWord();
     if (lastQuiz.length == 0) {
         let hh = document.getElementById('hh');
         hh.textContent = 'Let\'s add a new word to your vocabulary';
-        takeQuiz(quizWord, targetlang, userid, 'quizcd.html');
+        takeQuiz(quizWord, targetlang, userid, 'quizcd.html', false);
     }
     const timestamp = Date.now();
     const lastQuizTimestamp = Date.parse(lastQuiz[0].taken_at);
     console.log(timestamp - lastQuizTimestamp);
-    if (timestamp - lastQuizTimestamp < 86400000) {
-        window.location.href = 'quizcd.html'
-    }
     if (window.location.href.indexOf('requiz') == -1) {
+        if (timestamp - lastQuizTimestamp < 86400000) {
+            window.location.href = 'quizcd.html'
+        }
         let previousWords = [];
         let requestData = await getPreviousWords(userid);
         for (const entry of requestData) {
@@ -24,14 +25,14 @@ async function main() {
         while (previousWords.includes(quizWord)) {
             quizWord = await getWord();
         }
-        takeQuiz(quizWord, lastQuiz[0].lang, userid, 'quizcd.html');
+        takeQuiz(quizWord, targetlang, userid, 'quizcd.html', false);
     }
     else {
-        takeQuiz(lastQuiz[0].word, lastQuiz[0].lang, userid, "quiz.html?lang=" + lastQuiz[0].lang);
+        takeQuiz(lastQuiz[0].word, lastQuiz[0].lang, userid, "quiz.html?lang=" + lastQuiz[0].lang, true);
     }
 };
 
-async function takeQuiz(quizWord, targetlang, userid, redirect) {
+async function takeQuiz(quizWord, targetlang, userid, redirect, isReQuiz) {
     let succeses = 0;
     let attempts = 0;
     let quizOptions = [];
@@ -73,7 +74,8 @@ async function takeQuiz(quizWord, targetlang, userid, redirect) {
             this.style.backgroundColor = '#5bd123';
             succeses++;
             attempts++;
-            insertQuiz(userid, quizWord, targetlang, succeses, attempts);
+            if (!isReQuiz)
+                insertQuiz(userid, quizWord, targetlang, succeses, attempts);
             setTimeout(() => { 
                 window.location.href = redirect;
             }, 1000);
